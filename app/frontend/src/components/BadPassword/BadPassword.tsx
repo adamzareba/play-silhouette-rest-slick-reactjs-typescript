@@ -1,5 +1,6 @@
 import * as React from 'react';
 import './BadPassword.css';
+import { authenticationService } from '../../services/authenticationService';
 
 export interface BadPasswordProperties {
     value: string;
@@ -7,7 +8,7 @@ export interface BadPasswordProperties {
 
 export default ({value}: BadPasswordProperties) => (
     <div>
-        {localStorage.getItem('token') &&
+        {authenticationService.isAuthenticated() &&
         <p className="lead">You should not use {value} as your password!</p>
         }
     </div>

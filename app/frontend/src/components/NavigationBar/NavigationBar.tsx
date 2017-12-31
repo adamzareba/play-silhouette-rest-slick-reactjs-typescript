@@ -1,10 +1,18 @@
 import * as React from 'react';
 import './NavigationBar.css';
 import { authenticationService } from '../../services/authenticationService';
-import { NavLink } from 'react-router-dom';
+import AppBar from 'material-ui/AppBar';
+import Toolbar from 'material-ui/Toolbar';
+import Typography from 'material-ui/Typography';
+import Button from 'material-ui/Button';
+import Menu from 'material-ui/Menu';
+import MenuItem from 'material-ui/Menu/MenuItem';
+import { Link } from 'react-router-dom';
 
 interface NavigationBarState {
     isAuthenticated: boolean;
+    open: boolean;
+    anchorEl?: HTMLElement;
 }
 
 class NavigationBar extends React.Component<{}, NavigationBarState> {
@@ -12,10 +20,20 @@ class NavigationBar extends React.Component<{}, NavigationBarState> {
     constructor(props: {}) {
         super(props);
         this.state = {
-            isAuthenticated: authenticationService.isAuthenticated()
+            isAuthenticated: authenticationService.isAuthenticated(),
+            open: false,
+            anchorEl: undefined
         };
 
         this.logout = this.logout.bind(this);
+    }
+
+    handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        this.setState({open: true, anchorEl: event.currentTarget});
+    }
+
+    handleClose = () => {
+        this.setState({open: false});
     }
 
     logout() {
@@ -28,39 +46,31 @@ class NavigationBar extends React.Component<{}, NavigationBarState> {
 
     render() {
         return (
-            <nav className="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
-                <button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"/>
-                </button>
-                <NavLink className="navbar-brand" to={'/'}>Actions</NavLink>
+            <AppBar position="static">
+                <Toolbar>
+                    <Button aria-owns={this.state.open ? 'simple-menu' : null} onClick={this.handleClick} color="contrast">
+                        Actions
+                    </Button>
+                    <Menu id="simple-menu" anchorEl={this.state.anchorEl} open={this.state.open} onClose={this.handleClose}>
+                        <MenuItem onClick={this.handleClose}>
+                            <Link to={'/'}>Home</Link>
+                        </MenuItem>
+                    </Menu>
 
-                <div className="collapse navbar-collapse" id="navbarsExampleDefault">
-                    <ul className="navbar-nav mr-auto">
-                        <li className="nav-item">
-                            <NavLink className="nav-link" to={'/'}>Home</NavLink>
-                        </li>
-                        {!this.state.isAuthenticated &&
-                        <li className="nav-item">
-                            <NavLink className="nav-link" to={'/login'}>Login</NavLink>
-                        </li>
-                        }
-                        {this.state.isAuthenticated &&
-                        <li className="nav-item">
-                            <NavLink className="nav-link" to={'/'} onClick={this.logout}>Logout</NavLink>
-                        </li>
-                        }
-                        {!this.state.isAuthenticated &&
-                        <li className="nav-item">
-                            <NavLink className="nav-link" to={'/signup'}>Sign Up</NavLink>
-                        </li>
-                        }
-                    </ul>
-                    <form className="form-inline my-2 my-lg-0">
-                        <input className="form-control mr-sm-2" type="text" placeholder="Search"/>
-                        <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                    </form>
-                </div>
-            </nav>
+                    <Typography type="title" color="inherit">
+                        Silhouette FrontEnd App
+                    </Typography>
+                    {!this.state.isAuthenticated &&
+                    <Button color="contrast" href={'/login'}>Login</Button>
+                    }
+                    {this.state.isAuthenticated &&
+                    <Button color="contrast" href={'/'} onClick={this.logout}>Logout</Button>
+                    }
+                    {!this.state.isAuthenticated &&
+                    <Button color="contrast" href={'/signup'}>Sign Up</Button>
+                    }
+                </Toolbar>
+            </AppBar>
         );
     }
 }

@@ -1,9 +1,12 @@
 import * as React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import Home from './components/Home/Home';
-import Login from './components/Login/Login';
-import SignUp from './components/SignUp/SignUp';
-import NotFound from './components/NotFound/NotFound';
+import {
+    BrowserRouter,
+    Route,
+    Switch } from 'react-router-dom';
+import Home from '../components/Home/Home';
+import Login from '../components/Login/Login';
+import SignUp from '../components/SignUp/SignUp';
+import NotFound from '../components/NotFound/NotFound';
 
 export const Routes = () => (
     <BrowserRouter>

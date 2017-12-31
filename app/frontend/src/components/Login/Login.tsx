@@ -1,26 +1,36 @@
 import * as React from 'react';
 import './Login.css';
-import { Redirect } from 'react-router';
 import { authenticationService } from '../../services/authenticationService';
 import NavigationBar from '../NavigationBar/NavigationBar';
+import { FormHelperText, TextField } from 'material-ui';
+import Button from 'material-ui/Button';
+import Grid from 'material-ui/Grid';
+import { RouteComponentProps, withRouter } from 'react-router';
 
 interface LoginState {
     username?: string;
+    usernameError?: string;
     password?: string;
-    redirect?: boolean;
+    passwordError?: string;
+    credentialsError?: string;
 }
 
-class Login extends React.Component<{}, LoginState> {
+class Login extends React.Component<RouteComponentProps<{}>, LoginState> {
 
-    constructor(props: {}) {
+    constructor(props: RouteComponentProps<{}>) {
         super(props);
         this.state = {
             username: undefined,
+            usernameError: undefined,
             password: undefined,
-            redirect: false
+            passwordError: undefined,
+            credentialsError: undefined
         };
         this.login = this.login.bind(this);
-        this.onChange = this.onChange.bind(this);
+
+        if (authenticationService.isAuthenticated()) {
+            this.props.history.push('/');
+        }
     }
 
     login() {
@@ -28,47 +38,91 @@ class Login extends React.Component<{}, LoginState> {
             authenticationService.login(this.state.username as string, this.state.password as string)
                 .then(item => {
                     localStorage.setItem('token', item.token);
-                    this.setState({
-                        redirect: true
-                    });
-                    this.context.push({pathname: '/'});
+                    this.props.history.push('/');
                 })
                 .catch((error) => {
-                    console.error(error);
+                    this.setState({
+                        credentialsError: 'Username or password is not correct'
+                    });
                 });
         }
     }
 
-    onChange(event: React.FormEvent<HTMLInputElement>) {
+    onChange = (event: React.FormEvent<HTMLInputElement>) => {
+        this.validate();
         this.setState({
             [event.currentTarget.name]: event.currentTarget.value
         } as LoginState);
     }
 
-    render() {
-        if (this.state.redirect || authenticationService.isAuthenticated()) {
-            return (<Redirect to={'/'}/>);
+    validate() {
+        if (!this.state.username || this.state.username.length < 3) {
+            this.setState({
+                    usernameError: 'Username is too short'
+                }
+            );
+        } else {
+            this.setState({
+                    usernameError: undefined
+                }
+            );
         }
 
+        if (!this.state.password || this.state.password.length < 3) {
+            this.setState({
+                    passwordError: 'Password is too short'
+                }
+            );
+        } else {
+            this.setState({
+                    passwordError: undefined
+                }
+            );
+        }
+    }
+
+    render() {
         return (
             <div>
                 <NavigationBar/>
-                <div className="container">
-                    <h1>Login Page</h1>
+                <Grid container={true} alignItems="center" justify="center">
+                    <div>
+                        <h1>Login Page</h1>
 
-                    <div className="form-group">
-                        <label>Username</label>
-                        <input type="text" name="username" placeholder="username" className="form-control" onChange={this.onChange}/>
+                        <FormHelperText error={this.state.credentialsError !== undefined}>
+                            {this.state.credentialsError}
+                        </FormHelperText>
+                        <br />
+                        <TextField
+                            error={this.state.usernameError !== undefined}
+                            aria-describedby="username-error-text"
+                            name="username"
+                            onChange={this.onChange}
+                            label="Username"
+                            value={this.state.username}
+                        />
+                        <FormHelperText id="username-error-text">{this.state.usernameError}</FormHelperText>
+                        <br/>
+                        <TextField
+                            error={this.state.passwordError !== undefined}
+                            aria-describedby="password-error-text"
+                            name="password"
+                            type="password"
+                            onChange={this.onChange}
+                            label="Password"
+                            value={this.state.password}
+                        />
+                        <FormHelperText id="password-error-text">{this.state.passwordError}</FormHelperText>
+                        <br/><br/>
+
+                        <Button raised={true} color="primary" onClick={this.login}>
+                            Submit
+                        </Button>
                     </div>
-                    <div className="form-group">
-                        <label>Password</label>
-                        <input type="password" name="password" placeholder="password" className="form-control" onChange={this.onChange}/>
-                    </div>
-                    <button type="submit" className="btn btn-default" onClick={this.login}>Submit</button>
-                </div>
+                </Grid>
             </div>
         );
     }
 }
 
-export default Login;
+export default withRouter(Login);
