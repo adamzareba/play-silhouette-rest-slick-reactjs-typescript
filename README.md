@@ -1,60 +1,28 @@
-Silhouette REST Slick Seed
-=================================
+# `Silhouette REST Slick BackEnd + FrontEnd Seed` [![Build Status](https://travis-ci.org/adamzareba/play-silhouette-rest-slick-reactjs-typescript.svg)](https://travis-ci.org/adamzareba/play-silhouette-rest-slick-reactjs-typescript)
 
-Example project for Play Framework that uses [Silhouette](https://github.com/mohiva/play-silhouette) for authentication and authorization, exposed REST API for sign-up, sign-in.
+Example BackEnd project for Play Framework that uses [Silhouette](https://github.com/mohiva/play-silhouette) for authentication and authorization, exposed REST API for sign-up, sign-in + example FrontEnd project for ReactJS+ Typescript used for handling view layer.
+FrontEnd application implements authentication and accessing secured backend actions.
 
-## Basic usage
+BackEnd application uses [Play](https://www.playframework.com/), [Silhouette](https://github.com/mohiva/play-silhouette), [Slick](https://github.com/playframework/play-slick) and [H2](http://www.h2database.com) for storage. 
 
-### Sign-up
+FrontEnd application uses [Node.js](https://nodejs.org/), [React](https://reactjs.org/), [Typescript](https://www.typescriptlang.org/), [Material-UI](https://material-ui-next.com/). 
+Project generated based on [create-react-app-typescript](https://github.com/wmonk/create-react-app-typescript).
 
-```bash
-curl -X POST http://localhost:9000/api/auth/signup  -H 'Content-Type: application/json' -d '{"identifier": "adam.zareba", "password": "this!Password!Is!Very!Very!Strong!", "email": "adam.zareba@test.pl", "firstName": "Adam", "lastName": "Zaręba"}' -v
-```
+## Prerequisites
+    - node.js (recommended version 8.x)
+    - H2 (database)
 
-```
-< HTTP/1.1 200 OK
-< Content-Type: application/json; charset=utf-8
-< X-Auth-Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+## Installation
 
-{
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-  "expiresOn": "2017-10-06T07:49:27.238+02:00"
-}
-```
+* Before you run you have to build FrontEnd project. To do it run command in PROJECT_ROOT/app/frontend directory of project:
+    ```
+    npm i
+    ```
+* To run BackEnd + FrontEnd together you need to run command from project root directory:
+    ```
+    sbt run
+    ```
 
-### Sign-in
-
-_Not necessary just after the sign-up because you already have a valid token._
-
-```bash
-curl -X POST http://localhost:9000/api/auth/signin/credentials -H 'Content-Type: application/json' -d '{"identifier": "adam.zareba", "password": "this!Password!Is!Very!Very!Strong!"}' -v
-```
-
-```
-< HTTP/1.1 200 OK
-< Content-Type: application/json; charset=utf-8
-< X-Auth-Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
-
-{
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-  "expiresOn": "2017-10-06T07:49:27.238+02:00"
-}
-```
-
-### Secured Action with autorization
-
-_The token must belong to a user with Admin role_
-
-```bash
-curl http://localhost:9000/badPassword -H 'X-Auth-Token:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...' -v
-```
-
-```
-< HTTP/1.1 200 OK
-< Content-Type: application/json; charset=utf-8
-
-{"result":"qwerty1234"}
-```
 ## Built-in users
 
 | username    | password        |
